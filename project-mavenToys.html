@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maven Toys Mexico — SQL Capstone — Motunrayo Adegbayike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topnav">
+  <div class="wrap">
+    <a class="brand" href="index.html">Motunrayo Adegbayike</a>
+    <div class="links">
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#certifications">Certifications</a>
+      <a href="index.html#connect">Connect</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap detail-hero">
+  <a class="back" href="index.html#projects">&larr; Back to all projects</a>
+  <h1>Maven Toys Mexico — SQL Capstone</h1>
+  <div class="tools-line">SQL Server (SSMS)</div>
+  <p class="summary">A four-phase SQL Server capstone on the Mexico Toy Sales (Maven Toys) dataset — a star schema of sales, products, stores, and inventory covering January 2022 to December 2023. The project moves from raw data cleaning through exploratory analysis, advanced business questions using CTEs and window functions, and finally into reusable views, stored procedures, and summary tables for ongoing reporting.</p>
+
+  <div class="metric-strip"><div class="m"><span class="num">4</span><span class="label">Linked Tables</span></div><div class="m"><span class="num">18</span><span class="label">Business Questions</span></div><div class="m"><span class="num">4 + 3</span><span class="label">Views + Procedures</span></div></div>
+
+  <div class="tech-tags"><span class="tech-tag">3+ table INNER JOINs</span><span class="tech-tag">LEFT JOIN</span><span class="tech-tag">CTEs (WITH clause)</span><span class="tech-tag">Window functions — LAG(), RANK(), ROW_NUMBER()</span><span class="tech-tag">CASE WHEN</span><span class="tech-tag">Subqueries</span><span class="tech-tag">Date functions</span><span class="tech-tag">Views & Stored Procedures</span></div>
+
+  <div class="code-panel">WITH CATEGORY_AVG AS (
+    SELECT PRODUCT_CATEGORY,
+           AVG((UNITS * PRODUCT_PRICE) - (UNITS * PRODUCT_COST)) AS AVG_CATEGORY_PROFIT
+    FROM PRODUCTS
+    JOIN SALES ON PRODUCTS.PRODUCT_ID = SALES.PRODUCT_ID
+    GROUP BY PRODUCT_CATEGORY
+)
+SELECT ST.STORE_NAME, P.PRODUCT_CATEGORY,
+       SUM((UNITS * PRODUCT_PRICE) - (UNITS * PRODUCT_COST)) AS STORE_CATEGORY_PROFIT,
+       CA.AVG_CATEGORY_PROFIT,
+       CASE
+           WHEN SUM((UNITS*PRODUCT_PRICE)-(UNITS*PRODUCT_COST)) > CA.AVG_CATEGORY_PROFIT THEN 'ABOVE AVERAGE'
+           WHEN SUM((UNITS*PRODUCT_PRICE)-(UNITS*PRODUCT_COST)) < CA.AVG_CATEGORY_PROFIT THEN 'BELOW AVERAGE'
+           ELSE 'AT AVERAGE'
+       END AS PERFORMANCE
+FROM SALES S
+JOIN PRODUCTS P  ON S.PRODUCT_ID = P.PRODUCT_ID
+JOIN STORES ST   ON S.STORE_ID   = ST.STORE_ID
+JOIN CATEGORY_AVG CA ON P.PRODUCT_CATEGORY = CA.PRODUCT_CATEGORY
+GROUP BY ST.STORE_NAME, P.PRODUCT_CATEGORY, CA.AVG_CATEGORY_PROFIT
+ORDER BY P.PRODUCT_CATEGORY, STORE_CATEGORY_PROFIT DESC;</div>
+
+  <div class="download-row">
+    <a class="download-btn" href="https://drive.google.com/file/d/16cCpRFUhDOOaL_xDXJe4nDl-1ZQ50iYl/view?usp=sharing" target="_blank" rel="noopener">View Full SQL Script &rarr;</a>
+    <a class="download-btn" href="https://docs.google.com/document/d/1W-Df5p25wBpnWFbLka-MY8uiR_fMSlnd/edit?usp=sharing" target="_blank" rel="noopener">View Full Report &rarr;</a>
+  </div>
+
+  <div class="detail-findings">
+    <h2>Key Findings</h2>
+    <ul><li>Several stores fall below their category profit average, particularly in Electronics and Toys — worth investigating pricing strategy and stock availability there.</li><li>High-revenue stores carrying fewer than 5 units on best-sellers face direct stockout risk — the sp_inventory_alert procedure flags these automatically.</li><li>The top 3 products in each category generate a disproportionately large share of category revenue — a case for prioritizing their stock and shelf placement.</li><li>Most categories grew from 2022 to 2023; Art & Crafts grew strongest, Electronics slowest — suggesting where to shift investment.</li><li>High-margin products are frequently not the highest-volume sellers — a missed revenue opportunity worth targeted promotion.</li></ul>
+    <h2 style="margin-top:28px;">Reporting Objects Built</h2>
+    <ul><li>4 SQL views — vw_category_profit_vs_average, vw_low_inventory_alert, vw_store_monthly_revenue, vw_product_profitability</li><li>3 stored procedures — sp_store_revenue_summary, sp_category_monthly_trend, sp_inventory_alert</li><li>3 summary tables — summary_kpis, monthly_revenue_summary, store_performance_summary</li></ul>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>&copy; Motunrayo Adegbayike &middot; Built with Excel, SQL, and Power BI</p>
+  </div>
+</footer>
+</body>
+</html>
